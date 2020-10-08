@@ -1,6 +1,36 @@
 const puppeteer = require('puppeteer');
 var page = null;
 
+// Normalizing the text
+function getText(linkText) {
+    linkText = linkText.replace(/\r\n|\r/g, "\n");
+    linkText = linkText.replace(/\ +/g, " ");
+  
+    // Replace &nbsp; with a space 
+    var nbspPattern = new RegExp(String.fromCharCode(160), "g");
+    return linkText.replace(nbspPattern, " ");
+  }
+  
+  // find the link, by going over all links on the page
+  async function findByLink(page, linkString) {
+    const links = await page.$$('a')
+
+    for (var i=0; i < links.length; i++) {
+      let valueHandle = await links[i].getProperty('innerText');
+      let linkText = await valueHandle.jsonValue();
+      const text = getText(linkText);
+      if (text.includes(linkString)) {
+        console.log(linkString);
+        console.log(text);
+        console.log("Found");
+        links[i].click()
+        //return links[i];
+      }
+    }
+    return null;
+  }
+
+
 (async function () {
     const browser = await puppeteer.launch({
         headless: false
@@ -28,27 +58,16 @@ var page = null;
     await page.waitFor(2000);
 
     // Query parameters
-    const exerciseClass = "Body Balance";
+    const exerciseClass = "Full";
     const time = "10:30";
-    var targetElements;
 
-    targetElements = await page.evaluate(exerciseClass => {
-        // Get all elements
-        const elements = [...document.querySelectorAll('a')];
+    // var elements = [...document.querySelectorAll('a')]
+    // .filter(element => 
+    //   element.innerText.includes('Studio')
+    // )
 
-        // Filter to find elements with matching inner text
-        var e = elements.filter(e => e.innerText.includes(exerciseClass));
-        return e;
+    // console.log(elements.length);
 
-        // Make sure the element exists, and only then click it
-        //targetElements && targetElements[0].click();
-    }, exerciseClass)
+    await findByLink(page, "Studio");
 
-    for (let element of targetElements) {
-        console.log(element);
-        // element.click();
-        // await page.waitFor(2000);
-        // page.goBack();
-    }
-
-})().catch( e => { console.error(e) })
+})().catch( e => { console.error(e) });
