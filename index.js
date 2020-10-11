@@ -44,11 +44,11 @@ function getText(linkText) {
     
     // Enter username
     await page.click('#ctl00_MainContent_InputLogin');
-    await page.type('#ctl00_MainContent_InputLogin', process.env.CARD_NO)
+    await page.type('#ctl00_MainContent_InputLogin', process.env.CARD_NO || "N0077798")
 
     // Enter password
     await page.click('#ctl00_MainContent_InputPassword');
-    await page.type('#ctl00_MainContent_InputPassword', process.env.PASSCODE)
+    await page.type('#ctl00_MainContent_InputPassword', process.env.PASSCODE || "1125")
 
     // Click login
     await page.click('#ctl00_MainContent_btnLogin');
@@ -71,5 +71,9 @@ function getText(linkText) {
     const search = '[data-qa-id^="' + LedActivityID + activityID + '"'
     const spin = await page.$$(search)
     spin[0].click();
+    if ((await page.waitForXPath('//*[contains(text(), "09:16")]', 30000)) !== null){
+      console.log("book...")
+    }
+   
 
 })().catch( e => { console.error(e) });
