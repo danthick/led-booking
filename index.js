@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
+const dotenv = require('dotenv').config();
 var page = null;
+var cardNo = ""
 
 // Normalizing the text
 function getText(linkText) {
@@ -42,32 +44,32 @@ function getText(linkText) {
     
     // Enter username
     await page.click('#ctl00_MainContent_InputLogin');
-    await page.type('#ctl00_MainContent_InputLogin', "N0077798")
+    await page.type('#ctl00_MainContent_InputLogin', process.env.CARD_NO)
 
     // Enter password
     await page.click('#ctl00_MainContent_InputPassword');
-    await page.type('#ctl00_MainContent_InputPassword', "1125")
+    await page.type('#ctl00_MainContent_InputPassword', process.env.PASSCODE)
 
     // Click login
     await page.click('#ctl00_MainContent_btnLogin');
-    await page.waitFor(2000);
+    await page.waitForTimeout(2000);
 
     // Click '7 days time'
     await page.click('#ctl00_MainContent__advanceSearchUserControl__lnkBtnSevenDaysTime', {timeout: 50000});
 
-    await page.waitFor(2000);
+    await page.waitForTimeout(2000);
 
     // Query parameters
-    const exerciseClass = "Full";
-    const time = "10:30";
+    const LedActivityID="lnkbutton-AdvancedSearchResultUserControl-ActivityID="
+    const exerciseClass = "Studio Cycling";
+    const time = "09:15";
+    const activityID = "WESTCYCLE"
 
-    // var elements = [...document.querySelectorAll('a')]
-    // .filter(element => 
-    //   element.innerText.includes('Studio')
-    // )
 
-    // console.log(elements.length);
-
-    await findByLink(page, "Studio");
+    //await findByLink(page, exerciseClass);
+    //await page.waitForSelector('[data-qa-id*="lnkbutton-AdvancedSearchResultUserControl-ActivityID=WESTCYCLE5 ActivityType=Classes StatusClass=Full"]');
+    const search = '[data-qa-id^="' + LedActivityID + activityID + '"'
+    const spin = await page.$$(search)
+    spin[0].click();
 
 })().catch( e => { console.error(e) });
